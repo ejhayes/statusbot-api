@@ -15,6 +15,9 @@ task :console do
   # load the library
   require 'statusbot/api'
 
+  # and connect to the database
+  Statusbot::Api.connect
+
   ARGV.clear
   puts "Console Ready!"
   IRB.start
