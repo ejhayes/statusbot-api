@@ -1,8 +1,30 @@
-require "statusbot/api/version"
 require "statusbot/models"
+require "statusbot/api/version"
+require "statusbot/api/error"
+require "statusbot/api/base"
 
 module Statusbot
   module Api
-    Statusbot::Models.connect
+    @@connected = false
+
+    def self.api_for(user)
+      connect
+      Base.new(user)
+    end
+
+    def self.connect
+      unless @@connected
+        begin
+          Statusbot::Models.connect
+          @@connected = true
+        rescue => e
+          raise DatabaseConnectionError.new(e)
+        end
+      end
+    end
+
+    def self.disconnect
+      @@connected = false
+    end
   end
 end

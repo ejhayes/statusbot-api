@@ -21,3 +21,4 @@ tmp
 *.a
 mkmf.log
 *.sqlite3
+.DS_Store
