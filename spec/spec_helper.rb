@@ -13,6 +13,7 @@ $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 require 'database_cleaner'
 require 'statusbot/api'
 require 'debugger'
+require 'securerandom'
 
 RSpec.configure do |config|
   # Run specs in random order to surface order dependencies. If you find an

@@ -2,6 +2,7 @@ require "statusbot/models"
 require "statusbot/api/version"
 require "statusbot/api/error"
 require "statusbot/api/base"
+require 'date'
 
 module Statusbot
   module Api
