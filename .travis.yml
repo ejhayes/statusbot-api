@@ -6,5 +6,6 @@ env:
 before_script:
   - mysql -e 'create database statusbot_test;'
 script:
+  - bundle install --full-index
   - bundle exec statusbot-models db:migrate
   - CODECLIMATE_REPO_TOKEN=97f8bd51229920d343c4275c0632abebff3815a309bf49beb3d85bf936c92609 bundle exec rake spec
