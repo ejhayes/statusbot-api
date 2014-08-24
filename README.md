@@ -1,4 +1,4 @@
-# Statusbot::Api
+# Statusbot::Api [![Build Status](https://travis-ci.org/ejhayes/statusbot-api.svg?branch=master)](https://travis-ci.org/ejhayes/statusbot-api) [![Code Climate](https://codeclimate.com/github/ejhayes/statusbot-api/badges/gpa.svg)](https://codeclimate.com/github/ejhayes/statusbot-api) [![Test Coverage](https://codeclimate.com/github/ejhayes/statusbot-api/badges/coverage.svg)](https://codeclimate.com/github/ejhayes/statusbot-api) [![Requirements Status](https://requires.io/github/ejhayes/statusbot-api/requirements.png?branch=master)](https://requires.io/github/ejhayes/statusbot-api/requirements/?branch=master)
 
 Provides the API used by the statusbot.me worker processes.
 
