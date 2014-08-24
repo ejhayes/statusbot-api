@@ -243,14 +243,33 @@ describe Statusbot::Api::Base do
   describe :get_waits do
     describe :happy do
       describe 'when a user retrieves waits' do
-        it 'returns waits if they exist'
-        it 'does not return waits if none exist'
+        it 'returns waits if they exist' do
+          base.add_wait('this is a test wait')
+          result = base.get_waits
+
+          result.size.should == 1
+          result.first.user.email.should == @valid_user_email
+          result.first.description.should == 'this is a test wait'
+        end
+        it 'does not return waits if none exist' do
+          result = base.get_waits
+          
+          result.size.should == 0
+        end
       end
     end
 
     describe :sad do
       describe 'when the database connection is broken' do
-        it 'raises a DatabaseConnectionError'
+        it 'raises a DatabaseConnectionError' do
+          User.any_instance.should_receive(:waits) do
+            raise 'random-ass error'
+          end
+
+          expect {
+            base.get_waits
+          }.to raise_error Statusbot::Api::DatabaseConnectionError
+        end
       end
     end
   end

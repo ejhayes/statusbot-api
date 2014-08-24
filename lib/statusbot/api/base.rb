@@ -64,6 +64,14 @@ module Statusbot
           raise DatabaseConnectionError.new(e)
         end
       end
+
+      def get_waits
+        begin
+          @user.waits
+        rescue => e
+          raise DatabaseConnectionError.new(e)
+        end
+      end
     end
   end
 end
