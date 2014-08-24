@@ -277,16 +277,72 @@ describe Statusbot::Api::Base do
   describe :remind do
     describe :happy do
       describe 'when a user submits a valid reminder' do
-        it 'creates a ping record for the wait item'
+        it 'creates a ping record for the wait item with no description' do
+          base.add_wait('random-ass wait')
+          wait_item = base.get_waits.first
+          
+          base.remind(wait_item.id)
+
+          user = User.find_by_email!(@valid_user_email)
+          result = user.waits.first.pings
+          result.size.should == 1
+          result.first.description.should be_nil
+          result.first.created_at.to_i.should == @test_time.to_i
+        end
+
+        it 'creates a ping record for the wait item with a description' do
+          base.add_wait('random-ass wait')
+          wait_item = base.get_waits.first
+          base.remind(wait_item.id, 'note about ping')
+
+          user = User.find_by_email!(@valid_user_email)
+          result = user.waits.first.pings
+          result.size.should == 1
+          result.first.description.should == 'note about ping'
+          result.first.created_at.to_i.should == @test_time.to_i
+        end
       end
     end
 
     describe :sad do
       describe 'when a user submits an invalid reminder' do
-        it 'raises an InvalidUpdateError if the id is nil'
-        it 'raises an InvalidUpdateError if the id is a blank string'
-        it 'raises an InvalidUpdateError if the id is only spaces'
-        it 'raises an InvalidUpdateError if the id does not exist'
+        it 'raises an InvalidUpdateError if the id is nil' do
+          expect {
+            base.remind
+          }.to raise_error Statusbot::Api::InvalidUpdateError
+        end
+        it 'raises an InvalidUpdateError if the id is a blank string' do
+          expect {
+            base.remind('')
+          }.to raise_error Statusbot::Api::InvalidUpdateError
+        end
+        it 'raises an InvalidUpdateError if the id is only spaces' do
+          expect {
+            base.remind('        ')
+          }.to raise_error Statusbot::Api::InvalidUpdateError
+        end
+        it 'raises an InvalidUpdateError if the id does not exist' do
+          expect {
+            invalid_id = ( Wait.maximum(:id) || 0 ) + 1
+            base.remind(invalid_id)
+          }.to raise_error Statusbot::Api::InvalidUpdateError
+        end
+      end
+
+      describe 'when the database connection is broken' do
+        it 'raises a DatabaseConnectionError' do
+          Wait.should_receive(:find) do
+            wait = double('wait').as_null_object
+            wait.should_receive(:save!) do
+              raise 'random-ass error'
+            end
+            wait
+          end
+
+          expect {
+            base.remind(1)
+          }.to raise_error Statusbot::Api::DatabaseConnectionError
+        end
       end
     end
   end

@@ -73,6 +73,22 @@ module Statusbot
           raise DatabaseConnectionError.new(e)
         end
       end
+
+      def remind(wait_id=nil, description=nil)
+        raise InvalidUpdateError unless wait_id.is_a? Integer
+        begin
+          wait = Wait.find(wait_id)
+        rescue => e
+          raise InvalidUpdateError.new(e)
+        end
+        wait.pings << Ping.new(:description => description)
+        
+        begin
+          wait.save!
+        rescue => e
+          raise DatabaseConnectionError.new(e)
+        end
+      end
     end
   end
 end
