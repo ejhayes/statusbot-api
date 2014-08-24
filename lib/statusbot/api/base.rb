@@ -33,12 +33,12 @@ module Statusbot
 
       def add_goal(description=nil)
         raise InvalidUpdateError if description.nil? or description.strip.empty?
-        update = Goal.new(
+        goal = Goal.new(
           :user => @user, 
           :description => description
         )
         begin
-          update.save!
+          goal.save!
         rescue => e
           raise DatabaseConnectionError.new(e)
         end
