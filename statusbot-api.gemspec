@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["eric@deployfx.com.com"]
   spec.summary       = %q{Public API for statusbot.me workers}
   spec.description   = %q{Provides API functionality to statusbot.me}
-  spec.homepage      = "http://www.statusbot.me"
+  spec.homepage      = "https://github.com/ejhayes/statusbot-api"
   spec.license       = "MIT"
 
   spec.files = Dir["{lib}/**/*"]
