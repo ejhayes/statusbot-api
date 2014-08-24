@@ -173,14 +173,33 @@ describe Statusbot::Api::Base do
   describe :get_goals do
     describe :happy do
       describe 'when a user retrieves goals' do
-        it 'returns goals if they exist'
-        it 'does not return any goals if none exist'
+        it 'returns goals if they exist' do
+          base.add_goal('this is a test goal')
+          result = base.get_goals
+
+          result.size.should == 1
+          result.first.user.email.should == @valid_user_email
+          result.first.description.should == 'this is a test goal'
+        end
+        it 'does not return any goals if none exist' do
+          result = base.get_goals
+          
+          result.size.should == 0
+        end
       end
     end
 
     describe :sad do
       describe 'when the database conection is broken' do
-        it 'raises a DatabaseConnectionError'
+        it 'raises a DatabaseConnectionError' do
+          User.any_instance.should_receive(:goals) do
+            raise 'random-ass error'
+          end
+
+          expect {
+            base.get_goals
+          }.to raise_error Statusbot::Api::DatabaseConnectionError
+        end
       end
     end
   end

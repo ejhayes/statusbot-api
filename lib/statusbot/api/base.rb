@@ -43,6 +43,14 @@ module Statusbot
           raise DatabaseConnectionError.new(e)
         end
       end
+
+      def get_goals
+        begin
+          @user.goals
+        rescue => e
+          raise DatabaseConnectionError.new(e)
+        end
+      end
     end
   end
 end
