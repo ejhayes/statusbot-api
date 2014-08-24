@@ -22,6 +22,14 @@ module Statusbot
           raise DatabaseConnectionError.new(e)
         end
       end
+
+      def get_updates
+        begin
+          @user.updates
+        rescue => e
+          raise DatabaseConnectionError.new(e)
+        end
+      end
     end
   end
 end
