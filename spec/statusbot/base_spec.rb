@@ -2,18 +2,21 @@ require 'spec_helper'
 
 describe Statusbot::Api::Base do
 
-  before :all do
-    Statusbot::Api.connect
-    @user_email = SecureRandom.uuid
-    user = User.new(
-      :email => @user_email, 
+  before :each do
+    @valid_user_email = SecureRandom.uuid
+
+    @user_mock = mock_model(User, 
+      :email => @valid_user_email, 
       :first_name => 'Bob', 
       :last_name => 'Smith'
     )
-    user.save
+    
+    User.stub(:find_by_email!).with(@valid_user_email) do
+      @user_mock
+    end
   end
 
-  let(:base) { Statusbot::Api::Base.new(@user_email) }
+  let(:base) { Statusbot::Api::Base.new(@valid_user_email) }
 
   describe :new do
     describe :happy do
@@ -27,6 +30,10 @@ describe Statusbot::Api::Base do
     describe :sad do
       describe 'when a user does not exist' do
         it 'raises a UserNotRegisteredError' do
+          User.stub(:find_by_email!).with('I DO NOT EXIST') do
+            raise ActiveRecord::RecordNotFound
+          end
+
           expect { 
             Statusbot::Api::Base.new('I DO NOT EXIST')
           }.to raise_error Statusbot::Api::UserNotRegisteredError
@@ -39,8 +46,22 @@ describe Statusbot::Api::Base do
     describe :happy do
       describe 'when a user submits a valid update' do
         it 'creates an update record for the user' do
-          # TODO: verify record created for user
-          base.add_update('hey')
+          expected_time = DateTime.now
+          DateTime.stub(:now).and_return(expected_time)
+
+          example_update = 'random-ass update'
+
+          Update.stub(:new).with(
+            :user => @user_mock, 
+            :description => example_update, 
+            :start_time => expected_time
+          ) do
+            update = mock_model(Update)
+            update.should_receive(:save!)
+            update
+          end
+
+          base.add_update(example_update)
         end
       end
     end
