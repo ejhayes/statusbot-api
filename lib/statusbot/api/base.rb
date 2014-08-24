@@ -9,13 +9,18 @@ module Statusbot
         end
       end
 
-      def add_update(description)
+      def add_update(description=nil)
+        raise InvalidUpdateError if description.nil? or description.strip.empty?
         update = Update.new(
           :user => @user, 
           :description => description, 
           :start_time => DateTime.now
         )
-        update.save!
+        begin
+          update.save!
+        rescue => e
+          raise DatabaseConnectionError.new(e)
+        end
       end
     end
   end

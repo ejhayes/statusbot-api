@@ -8,5 +8,8 @@ module Statusbot
 
     class DatabaseConnectionError < Error
     end
+
+    class InvalidUpdateError < Error
+    end
   end
 end

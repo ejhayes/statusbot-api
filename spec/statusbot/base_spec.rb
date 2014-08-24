@@ -14,6 +14,9 @@ describe Statusbot::Api::Base do
     User.stub(:find_by_email!).with(@valid_user_email) do
       @user_mock
     end
+
+    @test_time = DateTime.now
+    DateTime.stub(:now).and_return(@test_time)
   end
 
   let(:base) { Statusbot::Api::Base.new(@valid_user_email) }
@@ -46,15 +49,12 @@ describe Statusbot::Api::Base do
     describe :happy do
       describe 'when a user submits a valid update' do
         it 'creates an update record for the user' do
-          expected_time = DateTime.now
-          DateTime.stub(:now).and_return(expected_time)
-
           example_update = 'random-ass update'
 
           Update.stub(:new).with(
             :user => @user_mock, 
             :description => example_update, 
-            :start_time => expected_time
+            :start_time => @test_time
           ) do
             update = mock_model(Update)
             update.should_receive(:save!)
@@ -68,15 +68,39 @@ describe Statusbot::Api::Base do
 
     describe :sad do
       describe 'when update description is not valid' do
-        it 'raises a InvalidUpdateError when update is nil'
+        it 'raises a InvalidUpdateError when update is nil' do
+          expect {
+            base.add_update
+          }.to raise_error Statusbot::Api::InvalidUpdateError
+        end
 
-        it 'raises an InvalidUpdateError when update is an empty string'
+        it 'raises an InvalidUpdateError when update is an empty string' do
+          expect {
+            base.add_update('')
+          }.to raise_error Statusbot::Api::InvalidUpdateError
+        end
 
-        it 'raises an InvalidUpdateError when update is only spaces'
+        it 'raises an InvalidUpdateError when update is only spaces' do
+          expect {
+            base.add_update('   ')
+          }.to raise_error Statusbot::Api::InvalidUpdateError
+        end
       end
 
       describe 'when the database connection is broken' do
-        it 'raises a DatabaseConnectionError'
+        it 'raises a DatabaseConnectionError' do
+          Update.stub(:new) do
+            update = mock_model(Update)
+            update.should_receive(:save!) do
+              raise 'some error'
+            end
+            update
+          end
+
+          expect {
+            base.add_update('hello world')
+          }.to raise_error Statusbot::Api::DatabaseConnectionError
+        end
       end
     end
   end
