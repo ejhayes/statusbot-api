@@ -55,6 +55,8 @@ describe Statusbot::Api::Base do
           result.first.start_time.to_i.should == @test_time.to_i
           result.first.stop_time.should be_nil
         end
+
+        it 'sets the stop_time of the previous task to the current time'
       end
     end
 
@@ -128,6 +130,120 @@ describe Statusbot::Api::Base do
             base.get_updates
           }.to raise_error Statusbot::Api::DatabaseConnectionError
         end
+      end
+    end
+  end
+
+  describe :add_goal do
+    describe :happy do
+      describe 'when a user submits a valid goal' do
+        it 'creates a goal record for the user' do
+          base.add_goal('random-ass goal')
+
+          user = User.find_by_email!(@valid_user_email)
+          result = user.goals
+          result.size.should == 1
+          result.first.description.should == 'random-ass goal'
+          result.first.created_at.to_i.should == @test_time.to_i
+        end
+      end
+    end
+
+    describe :sad do
+      describe 'when a user submits an invalid goal' do
+        it 'raises an InvalidUpdateError when update is nil' do
+          expect {
+            base.add_goal
+          }.to raise_error Statusbot::Api::InvalidUpdateError
+        end
+        it 'raises an InvalidUpdateError when update is an empty string' do
+          expect {
+            base.add_goal('')
+          }.to raise_error Statusbot::Api::InvalidUpdateError
+        end
+        it 'raises an InvalidUpdateError when update is only spaces' do
+          expect {
+            base.add_goal('   ')
+          }.to raise_error Statusbot::Api::InvalidUpdateError
+        end
+      end
+    end
+  end
+
+  describe :get_goals do
+    describe :happy do
+      describe 'when a user retrieves goals' do
+        it 'returns goals if they exist'
+        it 'does not return any goals if none exist'
+      end
+    end
+
+    describe :sad do
+      describe 'when the database conection is broken' do
+        it 'raises a DatabaseConnectionError'
+      end
+    end
+  end
+
+  describe :add_wait do
+    describe :happy do
+      describe 'when a user submits a valid wait' do
+        it 'creates a wait record for the user'
+      end
+    end
+
+    describe :sad do
+      describe 'when a user submits an invalid wait' do
+        it 'raises an InvalidUpdateError when update is nil'
+        it 'raises an InvalidUpdateError when update is an empty string'
+        it 'raises an InvalidUpdateError when update is only spaces'
+      end
+    end
+  end
+
+  describe :get_waits do
+    describe :happy do
+      describe 'when a user retrieves waits' do
+        it 'returns waits if they exist'
+        it 'does not return waits if none exist'
+      end
+    end
+
+    describe :sad do
+      describe 'when the database connection is broken' do
+        it 'raises a DatabaseConnectionError'
+      end
+    end
+  end
+
+  describe :remind do
+    describe :happy do
+      describe 'when a user submits a valid reminder' do
+        it 'creates a ping record for the wait item'
+      end
+    end
+
+    describe :sad do
+      describe 'when a user submits an invalid reminder' do
+        it 'raises an InvalidUpdateError if the id is nil'
+        it 'raises an InvalidUpdateError if the id is a blank string'
+        it 'raises an InvalidUpdateError if the id is only spaces'
+        it 'raises an InvalidUpdateError if the id does not exist'
+      end
+    end
+  end
+
+  describe :done do
+    describe :happy do
+      describe 'when a user is done' do
+        it 'sets the stop_time for any open tasks for the user'
+        it 'does nothing if a task has not been started'
+      end
+    end
+
+    describe :sad do
+      describe 'when the database connection is broken' do
+        it 'raises a DatabaseConnectionError'
       end
     end
   end
