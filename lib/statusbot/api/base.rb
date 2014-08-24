@@ -58,8 +58,9 @@ module Statusbot
           :user => @user, 
           :description => description
         )
+        @user.waits << wait
         begin
-          wait.save!
+          @user.save!
         rescue => e
           raise DatabaseConnectionError.new(e)
         end
