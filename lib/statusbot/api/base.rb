@@ -51,6 +51,19 @@ module Statusbot
           raise DatabaseConnectionError.new(e)
         end
       end
+
+      def add_wait(description=nil)
+        raise InvalidUpdateError if description.nil? or description.strip.empty?
+        wait = Wait.new(
+          :user => @user, 
+          :description => description
+        )
+        begin
+          wait.save!
+        rescue => e
+          raise DatabaseConnectionError.new(e)
+        end
+      end
     end
   end
 end

@@ -207,15 +207,35 @@ describe Statusbot::Api::Base do
   describe :add_wait do
     describe :happy do
       describe 'when a user submits a valid wait' do
-        it 'creates a wait record for the user'
+        it 'creates a wait record for the user' do
+          base.add_wait('random-ass wait')
+
+          user = User.find_by_email!(@valid_user_email)
+          result = user.waits
+          result.size.should == 1
+          result.first.description.should == 'random-ass wait'
+          result.first.created_at.to_i.should == @test_time.to_i
+        end
       end
     end
 
     describe :sad do
       describe 'when a user submits an invalid wait' do
-        it 'raises an InvalidUpdateError when update is nil'
-        it 'raises an InvalidUpdateError when update is an empty string'
-        it 'raises an InvalidUpdateError when update is only spaces'
+        it 'raises an InvalidUpdateError when update is nil' do
+          expect {
+            base.add_wait
+          }.to raise_error Statusbot::Api::InvalidUpdateError
+        end
+        it 'raises an InvalidUpdateError when update is an empty string' do
+          expect {
+            base.add_wait('')
+          }.to raise_error Statusbot::Api::InvalidUpdateError
+        end
+        it 'raises an InvalidUpdateError when update is only spaces' do
+          expect {
+            base.add_wait('   ')
+          }.to raise_error Statusbot::Api::InvalidUpdateError
+        end
       end
     end
   end
