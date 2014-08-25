@@ -1,4 +1,4 @@
-# Statusbot::Api [![Build Status](https://travis-ci.org/ejhayes/statusbot-api.svg?branch=master)](https://travis-ci.org/ejhayes/statusbot-api) [![Code Climate](https://codeclimate.com/github/ejhayes/statusbot-api/badges/gpa.svg)](https://codeclimate.com/github/ejhayes/statusbot-api) [![Test Coverage](https://codeclimate.com/github/ejhayes/statusbot-api/badges/coverage.svg)](https://codeclimate.com/github/ejhayes/statusbot-api) [![Requirements Status](https://requires.io/github/ejhayes/statusbot-api/requirements.png?branch=master)](https://requires.io/github/ejhayes/statusbot-api/requirements/?branch=master)
+# Statusbot::Api [![Build Status](https://travis-ci.org/ejhayes/statusbot-api.svg?branch=master)](https://travis-ci.org/ejhayes/statusbot-api) [![Code Climate](https://codeclimate.com/github/ejhayes/statusbot-api/badges/gpa.svg)](https://codeclimate.com/github/ejhayes/statusbot-api) [![Test Coverage](https://codeclimate.com/github/ejhayes/statusbot-api/badges/coverage.svg)](https://codeclimate.com/github/ejhayes/statusbot-api) [![Dependency Status](https://gemnasium.com/ejhayes/statusbot-api.svg)](https://gemnasium.com/ejhayes/statusbot-api)
 
 Provides the API used by the statusbot.me worker processes.
 
@@ -34,6 +34,11 @@ The following methods are available to the workers.
 - get_waits()
 - remind(wait_id)
 - done()
+
+## To Do
+
+The following things still need to be done at some point.
+
 - get_full_report()
 
 ## Contributing
