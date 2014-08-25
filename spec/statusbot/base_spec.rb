@@ -350,14 +350,45 @@ describe Statusbot::Api::Base do
   describe :done do
     describe :happy do
       describe 'when a user is done' do
-        it 'sets the stop_time for any open tasks for the user'
-        it 'does nothing if a task has not been started'
+        it 'sets the stop_time for any open tasks for the user' do
+          4.times do
+            base.add_update(SecureRandom.uuid)
+          end
+          
+          base.get_updates.each do |update|
+            update.stop_time.should be_nil
+          end
+
+          base.done
+
+          completed_updates = base.get_updates
+          completed_updates.size.should == 4
+          completed_updates.each do |update|
+            update.stop_time.to_i.should == @test_time.to_i
+          end
+
+        end
+        it 'does nothing if a task has not been started' do
+          base.done
+        end
       end
     end
 
     describe :sad do
       describe 'when the database connection is broken' do
-        it 'raises a DatabaseConnectionError'
+        it 'raises a DatabaseConnectionError' do
+          base.stub(:user) do
+            user = double('user')
+            user.should_receive(:updates) do
+              raise 'random-ass error'
+            end
+            user
+          end
+
+          expect {
+            base.done
+          }.to raise_error Statusbot::Api::DatabaseConnectionError
+        end
       end
     end
   end

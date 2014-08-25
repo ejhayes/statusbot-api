@@ -1,6 +1,8 @@
 module Statusbot
   module Api
     class Base
+      attr_reader :user
+
       def initialize(user_email)
         begin
           @user = User.find_by_email!(user_email)
@@ -12,7 +14,7 @@ module Statusbot
       def add_update(description=nil)
         raise InvalidUpdateError if description.nil? or description.strip.empty?
         update = Update.new(
-          :user => @user, 
+          :user => user, 
           :description => description, 
           :start_time => DateTime.now
         )
@@ -25,7 +27,7 @@ module Statusbot
 
       def get_updates
         begin
-          @user.updates
+          user.updates
         rescue => e
           raise DatabaseConnectionError.new(e)
         end
@@ -34,7 +36,7 @@ module Statusbot
       def add_goal(description=nil)
         raise InvalidUpdateError if description.nil? or description.strip.empty?
         goal = Goal.new(
-          :user => @user, 
+          :user => user, 
           :description => description
         )
         begin
@@ -46,7 +48,7 @@ module Statusbot
 
       def get_goals
         begin
-          @user.goals
+          user.goals
         rescue => e
           raise DatabaseConnectionError.new(e)
         end
@@ -55,12 +57,12 @@ module Statusbot
       def add_wait(description=nil)
         raise InvalidUpdateError if description.nil? or description.strip.empty?
         wait = Wait.new(
-          :user => @user, 
+          :user => user, 
           :description => description
         )
-        @user.waits << wait
+        user.waits << wait
         begin
-          @user.save!
+          user.save!
         rescue => e
           raise DatabaseConnectionError.new(e)
         end
@@ -68,7 +70,7 @@ module Statusbot
 
       def get_waits
         begin
-          @user.waits
+          user.waits
         rescue => e
           raise DatabaseConnectionError.new(e)
         end
@@ -88,6 +90,20 @@ module Statusbot
         rescue => e
           raise DatabaseConnectionError.new(e)
         end
+      end
+
+      def done
+        begin
+          ActiveRecord::Base.transaction do
+            user.updates.where(:stop_time => nil).each do |update|
+              update.stop_time = DateTime.now
+              update.save!
+            end
+          end
+        rescue => e
+          raise DatabaseConnectionError.new(e)
+        end
+        user.reload
       end
     end
   end
