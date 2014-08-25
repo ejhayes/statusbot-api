@@ -56,7 +56,15 @@ describe Statusbot::Api::Base do
           result.first.stop_time.should be_nil
         end
 
-        it 'sets the stop_time of the previous task to the current time'
+        it 'sets the stop_time of the previous task to the current time' do
+          base.add_update(SecureRandom.uuid)
+          update = base.get_updates.first
+          update.stop_time.should be_nil
+          base.add_update(SecureRandom.uuid)
+          update.reload
+          update.stop_time.to_i.should == @test_time.to_i
+          base.get_updates.last.stop_time.should be_nil
+        end
       end
     end
 
@@ -351,22 +359,14 @@ describe Statusbot::Api::Base do
     describe :happy do
       describe 'when a user is done' do
         it 'sets the stop_time for any open tasks for the user' do
-          4.times do
-            base.add_update(SecureRandom.uuid)
-          end
-          
-          base.get_updates.each do |update|
-            update.stop_time.should be_nil
-          end
+          base.add_update(SecureRandom.uuid)
+          update = base.get_updates.first
+          update.stop_time.should be_nil
 
           base.done
 
-          completed_updates = base.get_updates
-          completed_updates.size.should == 4
-          completed_updates.each do |update|
-            update.stop_time.to_i.should == @test_time.to_i
-          end
-
+          update.reload
+          update.stop_time.to_i.should == @test_time.to_i
         end
         it 'does nothing if a task has not been started' do
           base.done

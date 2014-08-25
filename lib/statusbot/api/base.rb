@@ -13,6 +13,7 @@ module Statusbot
 
       def add_update(description=nil)
         raise InvalidUpdateError if description.nil? or description.strip.empty?
+        done
         update = Update.new(
           :user => user, 
           :description => description, 
